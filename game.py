@@ -11,16 +11,16 @@ class EventBasedAnimationClass(object):
     def onMousePressed(self, event):
         self.mouseText = "last mousePressed: " + str((event.x, event.y))
 
-    def ignoreKey(self,event):
-        # Helper function to return the key from the given event
-        ignoreSyms = [ "Shift_L", "Shift_R", "Control_L", "Control_R", "Caps_Lock", "Return" ]
-        return (event.keysym in ignoreSyms)
+    def validKey(self, key):
+        return (key in self.validSyms)
 
     def onKeyPressed(self, event):
-        if event.keysym == "Return":
-            self.runCommand(self.keyText)
-        if self.ignoreKey(event) == False:
+        if self.validKey(event.keysym):
             self.keyText += (event.char)
+        elif event.keysym == "Return":
+            self.runCommand(self.keyText)
+        elif event.keysym == "BackSpace" and len(self.keyText) > 0:
+            self.keyText = self.keyText[:-1]
 
     def runCommand(self, command):
         print "your command was " + command
@@ -48,12 +48,15 @@ class EventBasedAnimationClass(object):
         self.canvas.create_rectangle(0, 950, 999, 999, fill = "black")
 
         self.canvas.create_text(150,20,text="events-example1.py")
-        self.canvas.create_text(20,980,text=self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
+        entered_text = self.canvas.create_text(20,978,text=self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
+        x0 = self.canvas.bbox(entered_text)[0]
+        x1 = self.canvas.bbox(entered_text)[2]
+
         self.canvas.create_text(150,80,text=self.timerText)
         self.canvas.create_text(150,40,text=self.mouseText)
 
         if self.timerCounter % 4 == 1 or self.timerCounter % 4 == 0:
-            self.canvas.create_line(10, 960, 10, 990, fill="white")
+            self.canvas.create_line(20+x1-x0, 960, 20+x1-x0, 990, fill="white")
         self.updateClock()
 
 
@@ -108,6 +111,7 @@ class EventBasedAnimationClass(object):
         self.timerText = "no time"
         self.minute = 0
         self.hour = 12
+        self.validSyms = ["Space"] + [chr(x) for x in range(48, 58)] + [chr(x) for x in range(65, 91)] + [chr(x) for x in range(97, 123)]
         self.redrawAll()
 
     def onMousePressedWrapper(self, event):
