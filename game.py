@@ -17,13 +17,13 @@ class EventBasedAnimationClass(object):
     def onKeyPressed(self, event):
         if self.validKey(event.keysym):
             self.keyText += (event.char)
-        elif event.keysym == "Return":
+        elif event.keysym == "Return" and len(self.keyText):
             self.runCommand(self.keyText)
-        elif event.keysym == "BackSpace" and len(self.keyText) > 0:
+        elif event.keysym == "BackSpace" and len(self.keyText):
             self.keyText = self.keyText[:-1]
 
     def runCommand(self, command):
-        print "your command was " + command
+        self.response = "I don't know how to " + command + "."
         self.keyText = ""
         self.redrawAll()
 
@@ -36,7 +36,7 @@ class EventBasedAnimationClass(object):
             self.minute = 0
         else:
             self.minute += 1
-        if (self.timerCounter > 100) and self.win != True:
+        if (self.timerCounter > 180) and self.win != True:
             print "ure a loser"
             # self.gameOver()
         self.updateClock()
@@ -45,10 +45,12 @@ class EventBasedAnimationClass(object):
         self.canvas.delete(ALL)
         # draw the text
         self.canvas.create_image(500, 500, image=self.canvas.data['image'])
-        self.canvas.create_rectangle(0, 950, 999, 999, fill = "black")
+        self.canvas.create_rectangle(0, 840, 999, 999, fill = "black")
 
         self.canvas.create_text(150,20,text="events-example1.py")
-        entered_text = self.canvas.create_text(20,978,text=self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
+        entered_text = self.canvas.create_text(20,968,text=self.carat + self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
+        self.canvas.create_text(20,860,text=self.response, fill="white", anchor=W, font=('Helvetica', 20))
+
         x0 = self.canvas.bbox(entered_text)[0]
         x1 = self.canvas.bbox(entered_text)[2]
 
@@ -56,7 +58,7 @@ class EventBasedAnimationClass(object):
         self.canvas.create_text(150,40,text=self.mouseText)
 
         if self.timerCounter % 4 == 1 or self.timerCounter % 4 == 0:
-            self.canvas.create_line(20+x1-x0, 960, 20+x1-x0, 990, fill="white")
+            self.canvas.create_line(20+x1-x0, 955, 20+x1-x0, 980, fill="white")
         self.updateClock()
 
 
@@ -107,10 +109,12 @@ class EventBasedAnimationClass(object):
         self.canvas.data = {}
         self.canvas.data["image"] = image
         self.mouseText = "hello"
-        self.keyText = "key"
+        self.keyText = ""
         self.timerText = "no time"
         self.minute = 0
         self.hour = 12
+        self.carat = "> "
+        self.response = "Let's bake some cookies!"
         self.validSyms = ["Space"] + [chr(x) for x in range(48, 58)] + [chr(x) for x in range(65, 91)] + [chr(x) for x in range(97, 123)]
         self.redrawAll()
 
