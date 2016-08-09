@@ -22,7 +22,7 @@ class EventBasedAnimationClass(object):
         self.keyText = ""
         if "preheat" in command or "heat" in command or ("turn on" in command and "oven" in command):
             self.response = "The oven is heating up."
-            self.canvas.data["image"] = PhotoImage(file="preheat.gif")
+            self.canvas.data["oven"] = PhotoImage(file="preheat.gif")
             self.ovenTimer = 1
         elif "book" in command:
             if self.bookOpened:
@@ -48,7 +48,7 @@ class EventBasedAnimationClass(object):
                 self.gameOver = True
             elif self.ovenTimer == 20:
                 self.response = "The oven is ready to go."
-                self.canvas.data["image"] = PhotoImage(file="preheated.gif")
+                self.canvas.data["oven"] = PhotoImage(file="preheated.gif")
         if self.minute == 59:
             self.hour += 1
             self.minute = 0
@@ -64,7 +64,22 @@ class EventBasedAnimationClass(object):
         # draw the text
         self.canvas.create_rectangle(0,0, 999,999, fill = "#9ad413")
         self.canvas.create_rectangle(0, 780, 999, 999, fill = "#4d3f73")
-        self.canvas.create_image(500, 500, image=self.canvas.data['ovenImage'])
+        self.canvas.create_image(500, 500, image=self.canvas.data["clock"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["oven"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["girl"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["counter"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["milk"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["egg3"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["egg2"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["egg1"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["flour"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["sugar"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["butter"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["chocolate"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["bowl"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["spoon"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["book"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["fire"])
         self.canvas.create_rectangle(0, 840, 999, 999, fill = "black")
 
         entered_text = self.canvas.create_text(20,968,text=self.carat + self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
@@ -125,7 +140,7 @@ class EventBasedAnimationClass(object):
         self.timerDelay = 250 # in milliseconds (set to None to turn off timer)
         self.canvas = Canvas(self.root, width=1000, height=1000)
         self.canvas.data = {
-            "ovenImage": PhotoImage(file="base_oven.gif"),
+            "oven": PhotoImage(file="base_oven.gif"),
             "fire": "",
             "clock": PhotoImage(file="clock.gif"),
             "book": PhotoImage(file="book_counter.gif"),
