@@ -28,8 +28,6 @@ class EventBasedAnimationClass(object):
             if self.bookOpened:
                 if "read" in command:
                     pass #macaroon recipe
-                elif :
-                    self.response = "The "
             else:
                 if "read" in command:
                     self.response = "It says 'Cookbook'."
@@ -45,7 +43,7 @@ class EventBasedAnimationClass(object):
             self.ovenTimer += 1
             if self.ovenTimer == 55:
                 # print "shit", self.ovenTimer
-                self.canvas.data["image"] = PhotoImage(file="fire.gif")
+                self.canvas.data["fire"] = PhotoImage(file="fire.gif")
                 self.response = "You set the house on fire..."
                 self.gameOver = True
             elif self.ovenTimer == 20:
@@ -64,7 +62,9 @@ class EventBasedAnimationClass(object):
     def redrawAll(self):
         self.canvas.delete(ALL)
         # draw the text
-        self.canvas.create_image(500, 500, image=self.canvas.data['image'])
+        self.canvas.create_rectangle(0,0, 999,999, fill = "#9ad413")
+        self.canvas.create_rectangle(0, 780, 999, 999, fill = "#4d3f73")
+        self.canvas.create_image(500, 500, image=self.canvas.data['ovenImage'])
         self.canvas.create_rectangle(0, 840, 999, 999, fill = "black")
 
         entered_text = self.canvas.create_text(20,968,text=self.carat + self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
@@ -125,8 +125,22 @@ class EventBasedAnimationClass(object):
         self.timerDelay = 250 # in milliseconds (set to None to turn off timer)
         self.canvas = Canvas(self.root, width=1000, height=1000)
         self.canvas.data = {
-            "image": PhotoImage(file="1.gif"),
-            "oven": PhotoImage(file="1.gif")
+            "ovenImage": PhotoImage(file="base_oven.gif"),
+            "fire": "",
+            "clock": PhotoImage(file="clock.gif"),
+            "book": PhotoImage(file="book_counter.gif"),
+            "bowl": PhotoImage(file="bowl.gif"),
+            "butter": PhotoImage(file="butter.gif"),
+            "chocolate": PhotoImage(file="chocolate.gif"),
+            "counter": PhotoImage(file="counter.gif"),
+            "egg1": PhotoImage(file="egg1.gif"),
+            "egg2": PhotoImage(file="egg2.gif"),
+            "egg3": PhotoImage(file="egg3.gif"),
+            "flour": PhotoImage(file="flour.gif"),
+            "girl": PhotoImage(file="girl.gif"),
+            "milk": PhotoImage(file="milk.gif"),
+            "spoon": PhotoImage(file="spoon.gif"),
+            "sugar": PhotoImage(file="sugar.gif")
         }
         self.response = "Let's bake some cookies!"
         self.keyText = ""
