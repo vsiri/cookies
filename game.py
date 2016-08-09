@@ -1,10 +1,5 @@
-# eventBasedAnimationDemo.py
-
 from Tkinter import *
 import math
-
-# eventBasedAnimationClass.py
-
 import sys
 
 class EventBasedAnimationClass(object):
@@ -19,7 +14,7 @@ class EventBasedAnimationClass(object):
             self.keyText += (event.char)
         elif event.keysym == "Return" and len(self.keyText):
             self.runCommand(self.keyText)
-        elif event.keysym == "BackSpace" and len(self.keyText):
+        elif event.keysym == "BackSpace":
             self.keyText = self.keyText[:-1]
 
     def runCommand(self, command):
@@ -29,22 +24,34 @@ class EventBasedAnimationClass(object):
             self.response = "The oven is heating up."
             self.canvas.data["image"] = PhotoImage(file="preheat.gif")
             self.ovenTimer = 1
+        elif "book" in command:
+            if self.bookOpened:
+                if "read" in command:
+                    pass #macaroon recipe
+                elif :
+                    self.response = "The "
+            else:
+                if "read" in command:
+                    self.response = "It says 'Cookbook'."
+                elif "open" in command:
+                    self.response = "You open the book."
+                    self.bookOpened = True
         self.redrawAll()
 
     def onTimerFired(self):
         self.timerCounter += 1
         self.timerText = "timerCounter = " + str(self.timerCounter)
-        if (self.ovenTimer):
+        if self.ovenTimer:
             self.ovenTimer += 1
-            if self.ovenTimer > 55:
-                print "shit", self.ovenTimer
-                self.canvas.data["ovenImage"] = PhotoImage(file="fire.gif")
+            if self.ovenTimer == 55:
+                # print "shit", self.ovenTimer
+                self.canvas.data["image"] = PhotoImage(file="fire.gif")
                 self.response = "You set the house on fire..."
                 self.gameOver = True
-            if self.ovenTimer == 20:
+            elif self.ovenTimer == 20:
                 self.response = "The oven is ready to go."
-                self.canvas.data["ovenImage"] = PhotoImage(file="preheated.gif")
-        if (self.minute == 59):
+                self.canvas.data["image"] = PhotoImage(file="preheated.gif")
+        if self.minute == 59:
             self.hour += 1
             self.minute = 0
         else:
@@ -60,7 +67,6 @@ class EventBasedAnimationClass(object):
         self.canvas.create_image(500, 500, image=self.canvas.data['image'])
         self.canvas.create_rectangle(0, 840, 999, 999, fill = "black")
 
-        self.canvas.create_text(150,20,text="events-example1.py")
         entered_text = self.canvas.create_text(20,968,text=self.carat + self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
         self.canvas.create_text(20,860,text=self.response, fill="white", anchor=W, font=('Helvetica', 20))
 
@@ -112,26 +118,29 @@ class EventBasedAnimationClass(object):
 
     def __init__(self, width=1000, height=1000):
         self.width = width
+        self.height = height
         self.win = False
         self.timerCounter = 0
         self.root = Tk()
-        self.height = height
-        self.text = ""
         self.timerDelay = 250 # in milliseconds (set to None to turn off timer)
         self.canvas = Canvas(self.root, width=1000, height=1000)
-        self.canvas.data = {}
-        self.canvas.data["image"] = PhotoImage(file="1.gif")
-        self.canvas.data[]
-        self.mouseText = "hello"
+        self.canvas.data = {
+            "image": PhotoImage(file="1.gif"),
+            "oven": PhotoImage(file="1.gif")
+        }
+        self.response = "Let's bake some cookies!"
         self.keyText = ""
-        self.timerText = "no time"
         self.minute = 0
-        self.gameOver = False
         self.hour = 12
+        self.gameOver = False
         self.carat = "> "
         self.ovenTimer = 0
-        self.response = "Let's bake some cookies!"
         self.validSyms = ["space"] + [chr(x) for x in range(48, 58)] + [chr(x) for x in range(97, 123)]
+        self.bookOpened = False
+
+        self.mouseText = "hello"
+        self.timerText = "no time"
+
         self.redrawAll()
 
     def onMousePressedWrapper(self, event):
