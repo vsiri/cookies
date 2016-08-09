@@ -25,21 +25,34 @@ class EventBasedAnimationClass(object):
     def runCommand(self, command):
         self.response = "I don't know how to " + command + "."
         self.keyText = ""
+        if "preheat" in command or "heat" in command or ("turn on" in command and "oven" in command):
+            self.response = "The oven is heating up."
+            self.canvas.data["image"] = PhotoImage(file="preheat.gif")
+            self.ovenTimer = 1
         self.redrawAll()
 
     def onTimerFired(self):
         self.timerCounter += 1
         self.timerText = "timerCounter = " + str(self.timerCounter)
-
+        if (self.ovenTimer):
+            self.ovenTimer += 1
+            if self.ovenTimer > 55:
+                print "shit", self.ovenTimer
+                self.canvas.data["ovenImage"] = PhotoImage(file="fire.gif")
+                self.response = "You set the house on fire..."
+                self.gameOver = True
+            if self.ovenTimer == 20:
+                self.response = "The oven is ready to go."
+                self.canvas.data["ovenImage"] = PhotoImage(file="preheated.gif")
         if (self.minute == 59):
             self.hour += 1
             self.minute = 0
         else:
             self.minute += 1
-        if (self.timerCounter > 180) and self.win != True:
+        if (self.timerCounter > 300) and self.win != True:
             print "ure a loser"
+            self.gameOver = True
             # self.gameOver()
-        self.updateClock()
 
     def redrawAll(self):
         self.canvas.delete(ALL)
@@ -59,7 +72,8 @@ class EventBasedAnimationClass(object):
 
         if self.timerCounter % 4 == 1 or self.timerCounter % 4 == 0:
             self.canvas.create_line(20+x1-x0, 955, 20+x1-x0, 980, fill="white")
-        self.updateClock()
+        if not self.gameOver:
+            self.updateClock()
 
 
 
@@ -105,17 +119,19 @@ class EventBasedAnimationClass(object):
         self.text = ""
         self.timerDelay = 250 # in milliseconds (set to None to turn off timer)
         self.canvas = Canvas(self.root, width=1000, height=1000)
-        image = PhotoImage(file="1.gif")
         self.canvas.data = {}
-        self.canvas.data["image"] = image
+        self.canvas.data["image"] = PhotoImage(file="1.gif")
+        self.canvas.data[]
         self.mouseText = "hello"
         self.keyText = ""
         self.timerText = "no time"
         self.minute = 0
+        self.gameOver = False
         self.hour = 12
         self.carat = "> "
+        self.ovenTimer = 0
         self.response = "Let's bake some cookies!"
-        self.validSyms = ["Space"] + [chr(x) for x in range(48, 58)] + [chr(x) for x in range(65, 91)] + [chr(x) for x in range(97, 123)]
+        self.validSyms = ["space"] + [chr(x) for x in range(48, 58)] + [chr(x) for x in range(97, 123)]
         self.redrawAll()
 
     def onMousePressedWrapper(self, event):
