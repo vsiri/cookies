@@ -1,5 +1,6 @@
 from Tkinter import *
 import math
+import time
 import sys
 
 class EventBasedAnimationClass(object):
@@ -20,20 +21,38 @@ class EventBasedAnimationClass(object):
     def runCommand(self, command):
         self.response = "I don't know how to " + command + "."
         self.keyText = ""
-        if "preheat" in command or "heat" in command or ("turn on" in command and "oven" in command):
+        if self.macaron:
+            if command == "continue":
+                self.macaron += 1
+                if self.macaron == len(self.macaronText) - 2:
+                    self.gameOver("Macaron")
+                else:
+                    self.response = self.macaronText[self.macaron - 2]
+            else:
+                self.response = "Type 'continue' to keep reading."
+        elif "preheat" in command or "heat" in command or ("turn on" in command and "oven" in command):
             self.response = "The oven is heating up."
             self.canvas.data["oven"] = PhotoImage(file="preheating_oven.gif")
             self.ovenTimer = 1
         elif "book" in command:
             if self.bookOpened:
                 if "read" in command:
-                    pass #macaroon recipe
+                    self.response = "You opened the book to a recipe to make macarons. Type 'continue' to keep reading."
+                    self.macaron = 1
             else:
                 if "read" in command:
                     self.response = "It says 'Cookbook'."
                 elif "open" in command:
                     self.response = "You open the book."
                     self.bookOpened = True
+        elif "cookie" in command and "recipe" in command:
+            if self.bookOpened:
+                self.response = "Ingredients: \u00B7\t flour, sugar, 2 eggs, 1 stick of butter, chocolate chips\n" \
+                                "Preheat oven to 350 degrees F. Mix together all of the ingredients.\n" \
+                                "Spoon dough onto a baking sheet. Bake for 10-30 minutes. Let cool before eating. :)"
+            else:
+                self.response = "Open the book first."
+
         self.redrawAll()
 
     def onTimerFired(self):
@@ -42,12 +61,9 @@ class EventBasedAnimationClass(object):
         if self.ovenTimer:
             self.ovenTimer += 1
             if self.ovenTimer == 55:
-                # print "shit", self.ovenTimer
-                self.canvas.data["fire"] = PhotoImage(file="fire.gif")
-                self.response = "You set the house on fire..."
-                self.gameOver = True
+                self.gameOver("Fire")
             elif self.ovenTimer == 20:
-                self.response = "The oven is ready to go."
+                self.response = "The  is ready to go."
                 self.canvas.data["oven"] = PhotoImage(file="preheated_oven.gif")
         if self.minute == 59:
             self.hour += 1
@@ -56,7 +72,6 @@ class EventBasedAnimationClass(object):
             self.minute += 1
         if (self.timerCounter > 300) and self.win != True:
             print "ure a loser"
-            self.gameOver = True
             # self.gameOver()
 
     def redrawAll(self):
@@ -93,8 +108,7 @@ class EventBasedAnimationClass(object):
 
         if self.timerCounter % 4 == 1 or self.timerCounter % 4 == 0:
             self.canvas.create_line(20+x1-x0, 955, 20+x1-x0, 980, fill="white")
-        if not self.gameOver:
-            self.updateClock()
+        self.updateClock()
 
 
 
@@ -161,11 +175,30 @@ class EventBasedAnimationClass(object):
         self.keyText = ""
         self.minute = 0
         self.hour = 12
-        self.gameOver = False
         self.carat = "> "
         self.ovenTimer = 0
         self.validSyms = ["space"] + [chr(x) for x in range(48, 58)] + [chr(x) for x in range(97, 123)]
         self.bookOpened = False
+        self.macaron = 0
+        self.macaronText = [
+            "How to make macarons:"
+            "Preheat the oven to 300 degrees F using the convection setting.",
+            "Line 3 baking sheets with silicone mats.",
+            "Measure the confectioners' sugar and almond flour by spooning them into measuring cups and leveling with a knife.",
+            "Transfer to a bowl; whisk to combine to combine.",
+            "Sift the sugar-almond flour mixture, a little at a time, through a fine-mesh sieve into a large bowl, pressing with a rubber spatula to pass through as must as possible.",
+            "It will take a while, and up to 2 tablespoons of coarse almond flour may be left; just toss it.",
+            "Beat the egg whites, cream of tartar and salt with a mixer on medium speed until frothy.",
+            "Increase the speed to medium high; gradually add the superfine sugar and beat until stiff and shiny, about 5 more minutes.",
+            "Transfer the batter to a pastry bag fitted with a 1/4-inch round tip.",
+            "Holding the bag vertically and close to the baking sheet, pipe 1 1/4-inch circles (24 per sheet).",
+            "Firmly tap the backing sheets twice against the counter to release any air bubbles.",
+            "Let the cookies sit at room temperature until the tops are no longer sticky to the touch, 15 minutes to 1 hour, depending on the humidity.",
+            "Slip another baking sheet under the first batch (a double baking sheet protects the cookies from the heat).",
+            "Bake the first batch until the cookies are shiny and rise 1/8 inch to form a 'foot,' about 20 minutes.",
+            "Transfer to a rack to cool completely.",
+            "Peel the cookies off the mats and sandwich a thin layer of filling."
+        ]
 
         self.mouseText = "hello"
         self.timerText = "no time"
@@ -189,6 +222,19 @@ class EventBasedAnimationClass(object):
 
         self.redrawAll()
         self.canvas.after(self.timerDelay, self.onTimerFiredWrapper)
+
+    def gameOver(self, string):
+        if string == "Fire":
+            self.canvas.data["fire"] = PhotoImage(file="fire.gif")
+            self.response = "You set the house on fire..."
+            self.redrawAll()
+            time.sleep(10)
+        elif string == "Macaron":
+            self.response = "You spent all day reading the macaron recipe..."
+            self.redrawAll()
+            time.sleep(10)
+        self.response = "Play again? Type 'Yes' to restart."
+        self.redrawAll()
 
     def quit(self):
         if (not self._isRunning): return
