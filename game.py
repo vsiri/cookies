@@ -22,7 +22,7 @@ class EventBasedAnimationClass(object):
         self.keyText = ""
         if "preheat" in command or "heat" in command or ("turn on" in command and "oven" in command):
             self.response = "The oven is heating up."
-            self.canvas.data["oven"] = PhotoImage(file="preheat.gif")
+            self.canvas.data["oven"] = PhotoImage(file="preheating_oven.gif")
             self.ovenTimer = 1
         elif "book" in command:
             if self.bookOpened:
@@ -48,7 +48,7 @@ class EventBasedAnimationClass(object):
                 self.gameOver = True
             elif self.ovenTimer == 20:
                 self.response = "The oven is ready to go."
-                self.canvas.data["oven"] = PhotoImage(file="preheated.gif")
+                self.canvas.data["oven"] = PhotoImage(file="preheated_oven.gif")
         if self.minute == 59:
             self.hour += 1
             self.minute = 0
