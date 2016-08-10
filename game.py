@@ -24,7 +24,7 @@ class EventBasedAnimationClass(object):
         if self.macaron:
             if command == "continue":
                 self.macaron += 1
-                if self.macaron == len(self.macaronText) - 2:
+                if self.macaron - 2 == len(self.macaronText):
                     self.gameOver("Macaron")
                 else:
                     self.response = self.macaronText[self.macaron - 2]
@@ -63,7 +63,7 @@ class EventBasedAnimationClass(object):
             if self.ovenTimer == 55:
                 self.gameOver("Fire")
             elif self.ovenTimer == 20:
-                self.response = "The  is ready to go."
+                self.response = "The oven is ready to go."
                 self.canvas.data["oven"] = PhotoImage(file="preheated_oven.gif")
         if self.minute == 59:
             self.hour += 1
@@ -181,7 +181,7 @@ class EventBasedAnimationClass(object):
         self.bookOpened = False
         self.macaron = 0
         self.macaronText = [
-            "How to make macarons:"
+            "How to make macarons:",
             "Preheat the oven to 300 degrees F using the convection setting.",
             "Line 3 baking sheets with silicone mats.",
             "Measure the confectioners' sugar and almond flour by spooning them into measuring cups and leveling with \n a knife.",
