@@ -71,7 +71,7 @@ class EventBasedAnimationClass(object):
         else:
             self.minute += 1
         if (self.timerCounter > 300) and self.win != True:
-            print "ure a loser"
+            self.gameOver("time")
             # self.gameOver()
 
     def redrawAll(self):
@@ -184,16 +184,16 @@ class EventBasedAnimationClass(object):
             "How to make macarons:"
             "Preheat the oven to 300 degrees F using the convection setting.",
             "Line 3 baking sheets with silicone mats.",
-            "Measure the confectioners' sugar and almond flour by spooning them into measuring cups and leveling with a knife.",
+            "Measure the confectioners' sugar and almond flour by spooning them into measuring cups and leveling with \n a knife.",
             "Transfer to a bowl; whisk to combine to combine.",
-            "Sift the sugar-almond flour mixture, a little at a time, through a fine-mesh sieve into a large bowl, pressing with a rubber spatula to pass through as must as possible.",
+            "Sift the sugar-almond flour mixture, a little at a time, through a fine-mesh sieve into a large bowl, pressing \n with a rubber spatula to pass through as must as possible.",
             "It will take a while, and up to 2 tablespoons of coarse almond flour may be left; just toss it.",
             "Beat the egg whites, cream of tartar and salt with a mixer on medium speed until frothy.",
-            "Increase the speed to medium high; gradually add the superfine sugar and beat until stiff and shiny, about 5 more minutes.",
+            "Increase the speed to medium high; gradually add the superfine sugar and beat until stiff and shiny, about 5 \n more minutes.",
             "Transfer the batter to a pastry bag fitted with a 1/4-inch round tip.",
             "Holding the bag vertically and close to the baking sheet, pipe 1 1/4-inch circles (24 per sheet).",
             "Firmly tap the backing sheets twice against the counter to release any air bubbles.",
-            "Let the cookies sit at room temperature until the tops are no longer sticky to the touch, 15 minutes to 1 hour, depending on the humidity.",
+            "Let the cookies sit at room temperature until the tops are no longer sticky to the touch, 15 minutes to 1 hour, \n depending on the humidity.",
             "Slip another baking sheet under the first batch (a double baking sheet protects the cookies from the heat).",
             "Bake the first batch until the cookies are shiny and rise 1/8 inch to form a 'foot,' about 20 minutes.",
             "Transfer to a rack to cool completely.",
@@ -227,13 +227,14 @@ class EventBasedAnimationClass(object):
         if string == "Fire":
             self.canvas.data["fire"] = PhotoImage(file="fire.gif")
             self.response = "You set the house on fire..."
-            self.redrawAll()
-            time.sleep(10)
         elif string == "Macaron":
             self.response = "You spent all day reading the macaron recipe..."
-            self.redrawAll()
-            time.sleep(10)
+        elif string == "time":
+            self.response = "You wasted all your time... how are you so slow?"
+        self.redrawAll()
+        time.sleep(10)
         self.response = "Play again? Type 'Yes' to restart."
+
         self.redrawAll()
 
     def quit(self):
