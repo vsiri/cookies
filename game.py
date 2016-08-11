@@ -21,17 +21,23 @@ class EventBasedAnimationClass(object):
     def mixItems(self):
         for item in self.recipe:
             self.canvas.data[item] = ""
-
+        self.response = "Yum cookie dough."
         self.canvas.data["bowl"] = PhotoImage(file="bowl_mixed.gif")
 
     def transferToSheet(self):
-        return
+        if self.scooped:
+            self.response = "You scoop balls of cookie dough onto the baking sheet."
+            self.canvas.data["sheet"] = PhotoImage(file="sheet_scooped.gif")
+        else:
+            self.response = "You put all of the dough onto the baking sheet."
+            self.canvas.data["sheet"] = PhotoImage(file="sheet_giant_cookie.gif")
+
 
     def bakeCookies(self):
         if self.preheated:
             self.cookieTimer += 1
             self.canvas.data["oven"] = PhotoImage(file="oven_baking.gif")
-
+            # self.canvas.data["sheet"] = ""
         else:
             self.response = "You didn't wait for the oven to heat up."
             self.gameOver("preheat")
@@ -54,7 +60,7 @@ class EventBasedAnimationClass(object):
                 self.response = "I guess you can't read... there was no milk in the recipe!!!!!!!!"
                 self.gameOver("milk")
                 return
-            if self.item == "egg1":
+            elif self.item == "egg1":
                 self.response = "Really? There were only two eggs in the recipe."
                 self.gameOver("egg")
                 return
@@ -64,8 +70,12 @@ class EventBasedAnimationClass(object):
                 self.response = "You add the egg to the bowl."
             else:
                 self.response = "You add the " + self.item + " to the bowl."
-
             self.item = ""
+        elif "oven" in command:
+            if self.scooped:
+                self.bakeCookies()
+            else:
+                self.gameOver("bowl")
 
         else:
             self.response = "You aren't carrying anything!"
@@ -158,6 +168,12 @@ class EventBasedAnimationClass(object):
                 elif "open" in command:
                     self.response = "You open the book."
                     self.bookOpened = True
+        elif ("sheet" in command or "tray" in command or "pan" in command) and "dough" in command:
+            if self.mixed:
+                self.scooped = "spoon" in command or "scoop" in command
+                self.transferToSheet()
+            else:
+                self.response = "I don't think you're ready for that yet."
         elif "cookie" in command or "recipe" in command:
             if self.bookOpened:
                 self.response = "Ingredients: flour, sugar, 2 eggs, 1 stick of butter, chocolate chips\n" \
@@ -181,11 +197,6 @@ class EventBasedAnimationClass(object):
                     self.gameOver("ingredients")
             else:
                 self.response = "Are you trying to mix this with your hands? Gross."
-        elif "sheet" in command or "baking" in command:
-            if self.mixed:
-                self.transferToSheet()
-            else:
-                self.response = "I don't think you're ready for that yet."
         else:
             self.response = "I don't know how to " + command + "."
 
@@ -205,7 +216,9 @@ class EventBasedAnimationClass(object):
                 self.canvas.data["oven"] = PhotoImage(file="preheated_oven.gif")
         if self.cookieTimer:
             self.cookieTimer += 1
-            if self.cookieTimer == 31:
+            if self.cookieTimer == 11:
+                self.canvas.data["oven"] = PhotoImage(file="oven_cooked.gif")
+            elif self.cookieTimer == 31:
                 self.canvas.data["oven"] = PhotoImage(file="oven_burnt.gif")
                 self.gameOver("burnt")
         if self.minute == 59:
@@ -215,7 +228,6 @@ class EventBasedAnimationClass(object):
             self.minute += 1
         if (self.timerCounter > 500) and self.win != True:
             self.gameOver("time")
-            # self.gameOver()
 
     def redrawAll(self):
         self.canvas.delete(ALL)
@@ -329,6 +341,7 @@ class EventBasedAnimationClass(object):
         self.ovenTimer = 0
         self.validSyms = ["space"] + [chr(x) for x in range(48, 58)] + [chr(x) for x in range(97, 123)]
         self.bookOpened = False
+        self.scooped = False
         self.macaron = 0
         self.macaronText = [
             "How to make macarons:",
