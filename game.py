@@ -213,7 +213,7 @@ class EventBasedAnimationClass(object):
             self.minute = 0
         else:
             self.minute += 1
-        if (self.timerCounter > 300) and self.win != True:
+        if (self.timerCounter > 500) and self.win != True:
             self.gameOver("time")
             # self.gameOver()
 
