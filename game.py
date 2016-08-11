@@ -18,8 +18,121 @@ class EventBasedAnimationClass(object):
         elif event.keysym == "BackSpace":
             self.keyText = self.keyText[:-1]
 
+    def mixItems(self):
+        for item in self.recipe:
+            self.canvas.data[item] = ""
+
+        self.canvas.data["bowl"] = PhotoImage(file="bowl_mixed.gif")
+
+    def transferToSheet(self):
+        return
+
+    def bakeCookies(self):
+        if self.preheated:
+            self.cookieTimer += 1
+            self.canvas.data["oven"] = PhotoImage(file="oven_baking.gif")
+
+        else:
+            self.response = "You didn't wait for the oven to heat up."
+            self.gameOver("preheat")
+
+    def putDownItem(self, command):
+        if "bowl" not in command and self.item:
+            if "egg" not in self.item:
+                self.canvas.data[self.item] = PhotoImage(file=self.item+".gif")
+                self.response = "You put the " + self.item + " back on the counter."
+            else:
+                self.eggsLeft += 1
+                self.canvas.data[self.item] = PhotoImage(file=self.item + ".gif")
+                self.response = "You put the egg back on the counter."
+            self.item = ""
+        elif "spoon" in command and "bowl" in command and self.item == "spoon":
+            self.response = "You can't put the spoon in the bowl."
+
+        elif "bowl" in command and self.item:
+            if self.item == "milk":
+                self.response = "I guess you can't read... there was no milk in the recipe!!!!!!!!"
+                self.gameOver("milk")
+                return
+            if self.item == "egg1":
+                self.response = "Really? There were only two eggs in the recipe."
+                self.gameOver("egg")
+                return
+            self.bowl += [self.item]
+            self.canvas.data[self.item] = PhotoImage(file=self.item+"_bowl" + ".gif")
+            if "egg" in self.item:
+                self.response = "You add the egg to the bowl."
+            else:
+                self.response = "You add the " + self.item + " to the bowl."
+
+            self.item = ""
+
+        else:
+            self.response = "You aren't carrying anything!"
+        return
+
+    def pickUpItem(self, command):
+        if self.item and self.item in command:
+            self.response = "You already have that item."
+            return
+
+        if self.item:
+            self.response = "You can't pick up that many things at once!"
+            return
+
+        for item in self.bowl:
+            if item in command:
+                self.response = "You already used all of the " + item + "."
+                return
+            elif "egg" in command and "egg1" in self.bowl and not self.eggsLeft:
+                self.response = "There are no more eggs!"
+                return
+
+        if "sugar" in command:
+            self.item = "sugar"
+
+        elif "chocolate" in command:
+            self.item = "chocolate"
+
+        elif "milk" in command:
+            self.item = "milk"
+
+        elif "flour" in command:
+            self.item = "flour"
+
+        elif "butter" in command:
+            self.item = "butter"
+
+        elif "egg" in command and self.eggsLeft != 0:
+            self.item = "egg" + str(self.eggsLeft)
+            self.canvas.data[self.item] = ""
+            self.eggsLeft -= 1
+            self.response = "You picked up an egg."
+            return
+
+        elif "spoon" in command:
+            self.item = "spoon"
+            self.canvas.data["spoon"] = ""
+            self.response = "Ready to mix."
+            return
+
+        elif "book" in command:
+            self.response = "Why don't you just read it?"
+            return
+
+        elif "bowl" in command:
+            self.response = "What are you trying to do with the bowl?"
+            return
+
+        else:
+            self.response = "I did not understand your request."
+            return
+
+        self.canvas.data[self.item] = ""
+        self.response = "You picked up the " + self.item + "."
+        return
+
     def runCommand(self, command):
-        self.response = "I don't know how to " + command + "."
         self.keyText = ""
         if self.macaron:
             if command == "continue":
@@ -45,13 +158,37 @@ class EventBasedAnimationClass(object):
                 elif "open" in command:
                     self.response = "You open the book."
                     self.bookOpened = True
-        elif "cookie" in command and "recipe" in command:
+        elif "cookie" in command or "recipe" in command:
             if self.bookOpened:
-                self.response = "Ingredients: \u00B7\t flour, sugar, 2 eggs, 1 stick of butter, chocolate chips\n" \
+                self.response = "Ingredients: flour, sugar, 2 eggs, 1 stick of butter, chocolate chips\n" \
                                 "Preheat oven to 350 degrees F. Mix together all of the ingredients.\n" \
                                 "Spoon dough onto a baking sheet. Bake for 10-30 minutes. Let cool before eating. :)"
             else:
                 self.response = "Open the book first."
+        elif "pick" in command or "get" in command:
+            self.pickUpItem(command)
+
+        elif "oven" in command and "in" in command:
+            print "ok"
+        elif "place" in command or "put" in command or "down" in command:
+            self.putDownItem(command)
+        elif "mix" in command:
+            if self.item == "spoon":
+                if set(self.recipe) == set(self.bowl):
+                    self.mixed = True
+                    self.mixItems()
+                else:
+                    self.gameOver("ingredients")
+            else:
+                self.response = "Are you trying to mix this with your hands? Gross."
+        elif "sheet" in command or "baking" in command:
+            if self.mixed:
+                self.transferToSheet()
+            else:
+                self.response = "I don't think you're ready for that yet."
+        else:
+            self.response = "I don't know how to " + command + "."
+
 
         self.redrawAll()
 
@@ -64,7 +201,13 @@ class EventBasedAnimationClass(object):
                 self.gameOver("Fire")
             elif self.ovenTimer == 20:
                 self.response = "The oven is ready to go."
+                self.preheated = True
                 self.canvas.data["oven"] = PhotoImage(file="preheated_oven.gif")
+        if self.cookieTimer:
+            self.cookieTimer += 1
+            if self.cookieTimer == 31:
+                self.canvas.data["oven"] = PhotoImage(file="oven_burnt.gif")
+                self.gameOver("burnt")
         if self.minute == 59:
             self.hour += 1
             self.minute = 0
@@ -83,6 +226,9 @@ class EventBasedAnimationClass(object):
         self.canvas.create_image(500, 500, image=self.canvas.data["oven"])
         self.canvas.create_image(500, 500, image=self.canvas.data["girl"])
         self.canvas.create_image(500, 500, image=self.canvas.data["counter"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["bowl"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["book"])
+        self.canvas.create_image(500, 500, image=self.canvas.data["sheet"])
         self.canvas.create_image(500, 500, image=self.canvas.data["milk"])
         self.canvas.create_image(500, 500, image=self.canvas.data["egg3"])
         self.canvas.create_image(500, 500, image=self.canvas.data["egg2"])
@@ -91,14 +237,12 @@ class EventBasedAnimationClass(object):
         self.canvas.create_image(500, 500, image=self.canvas.data["sugar"])
         self.canvas.create_image(500, 500, image=self.canvas.data["butter"])
         self.canvas.create_image(500, 500, image=self.canvas.data["chocolate"])
-        self.canvas.create_image(500, 500, image=self.canvas.data["bowl"])
         self.canvas.create_image(500, 500, image=self.canvas.data["spoon"])
-        self.canvas.create_image(500, 500, image=self.canvas.data["book"])
         self.canvas.create_image(500, 500, image=self.canvas.data["fire"])
         self.canvas.create_rectangle(0, 840, 999, 999, fill = "black")
 
         entered_text = self.canvas.create_text(20,968,text=self.carat + self.keyText, fill="white", anchor=W, font=('Helvetica', 20))
-        self.canvas.create_text(20,860,text=self.response, fill="white", anchor=W, font=('Helvetica', 20))
+        self.canvas.create_text(20,860,text=self.response, fill="white", anchor=NW, font=('Helvetica', 20))
 
         x0 = self.canvas.bbox(entered_text)[0]
         x1 = self.canvas.bbox(entered_text)[2]
@@ -109,8 +253,6 @@ class EventBasedAnimationClass(object):
         if self.timerCounter % 4 == 1 or self.timerCounter % 4 == 0:
             self.canvas.create_line(20+x1-x0, 955, 20+x1-x0, 980, fill="white")
         self.updateClock()
-
-
 
     def updateClock(self):
         width = (583 - 440)
@@ -150,9 +292,15 @@ class EventBasedAnimationClass(object):
         self.height = height
         self.win = False
         self.timerCounter = 0
+        self.cookieTimer = 0
         self.root = Tk()
+        self.bowl = []
+        self.recipe = ["butter", "chocolate", "egg2", "egg3", "flour", "sugar"]
+        self.eggsLeft = 3
+        self.preheated = False
         self.timerDelay = 250 # in milliseconds (set to None to turn off timer)
         self.canvas = Canvas(self.root, width=1000, height=1000)
+        self.mixed = False
         self.canvas.data = {
             "oven": PhotoImage(file="base_oven.gif"),
             "fire": "",
@@ -168,11 +316,13 @@ class EventBasedAnimationClass(object):
             "flour": PhotoImage(file="flour.gif"),
             "girl": PhotoImage(file="girl.gif"),
             "milk": PhotoImage(file="milk.gif"),
+            "sheet": PhotoImage(file="sheet.gif"),
             "spoon": PhotoImage(file="spoon.gif"),
             "sugar": PhotoImage(file="sugar.gif")
         }
         self.response = "Let's bake some cookies!"
         self.keyText = ""
+        self.item = ""
         self.minute = 0
         self.hour = 12
         self.carat = "> "
@@ -232,8 +382,8 @@ class EventBasedAnimationClass(object):
         elif string == "time":
             self.response = "You wasted all your time... how are you so slow?"
         self.redrawAll()
-        time.sleep(10)
-        self.response = "Play again? Type 'Yes' to restart."
+        # time.sleep(10)
+        self.response = "Play again? Type 'yes' to restart."
 
         self.redrawAll()
 
